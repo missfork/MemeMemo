@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback,useRef} from 'react';
-import './game.scss';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import "./game.scss";
+import localStorageUtil from "../util/localStorage";
 import gif1 from "../assets/1.gif";
 import gif2 from "../assets/2.gif";
 import gif3 from "../assets/3.gif";
@@ -8,15 +9,28 @@ import gif5 from "../assets/5.gif";
 import gif6 from "../assets/6.gif";
 import gif7 from "../assets/7.gif";
 import gif8 from "../assets/8.gif";
+import noob from "../assets/noob.gif";
+import advance from "../assets/advance.gif";
+import god from "../assets/god.gif";
+import intermediate from "../assets/intermediate.gif";
 
-function Game() {
-  const [gameCards, setGameCards] = useState([]);
-  const [flip, setFlip] = useState([]);
-  const [match, setMatch] = useState([]);
-  const [move, setMove] = useState(0);
+function Game({ goHome }) {
+  const [gameCards, setGameCards] = useState(
+    localStorageUtil.getItem("cards") || []
+  );
+  const [flip, setFlip] = useState(localStorageUtil.getItem("flip") || []);
+  const [match, setMatch] = useState(localStorageUtil.getItem("match") || []);
+  const [move, setMove] = useState(localStorageUtil.getItem("move") || 0);
   const [click, setClick] = useState(true);
-  const [score, setScore] = useState(0);
-const modalRef =useRef();
+  const [score, setScore] = useState(localStorageUtil.getItem("score") || 0);
+  const modalRef = useRef();
+
+  const moveRef = useRef(move);
+  const scoreRef = useRef(score);
+  const flipRef = useRef(flip);
+  const matchRef = useRef(match);
+  const gameCardsRef = useRef(gameCards);
+
   const gifs = [
     { gif: gif1, id: "gif1" },
     { gif: gif2, id: "gif2" },
@@ -38,79 +52,109 @@ const modalRef =useRef();
     return newCards;
   }, []);
 
-
-  const reset=()=>{
-    
-    cardMixer([...gifs,...gifs])
-    setFlip([])
-    setMatch([])
-    setScore(0)
-    setMove(0)
-    setClick(true)
-    closeModal()
-  }
-  const openModal = () => {
-    modalRef.current.showModal();
-  };
-
-  const closeModal = () => {
-    modalRef.current.close();
-  };
+ 
+  useEffect(() => {
+    moveRef.current = move;
+    scoreRef.current = score;
+    flipRef.current = flip;
+    matchRef.current = match;
+    gameCardsRef.current = gameCards;
+  }, [move, score, flip, match, gameCards]);
 
   useEffect(() => {
-    setGameCards(cardMixer([...gifs, ...gifs]));
-  }, [cardMixer]);
 
-  const handleFlip = useCallback((index) => {
-    if (flip.length < 2) {
-      setFlip((prev) => [...prev, index]);
+    if(!localStorageUtil.getItem("move")){
+      setGameCards(cardMixer([...gifs, ...gifs]));
     }
-  }, [flip]);
+    
+
+    return () => {
+      console.log("Cleanup", moveRef.current, scoreRef.current);
+// save game data
+      if (moveRef.current > 0 && scoreRef.current < 8) {
+        localStorageUtil.setItem("score", scoreRef.current);
+        localStorageUtil.setItem("move", moveRef.current);
+        localStorageUtil.setItem("flip", flipRef.current);
+        localStorageUtil.setItem("cards", gameCardsRef.current);
+        localStorageUtil.setItem("match", matchRef.current);
+        localStorageUtil.setItem("pause", true);
+      } else {
+        localStorageUtil.clearStorage();
+      }
+    };
+  }, []);
+
+  const handleFlip = useCallback(
+    (index) => {
+      if (flip.length < 2) {
+        setFlip((prev) => [...prev, index]);
+      }
+    },
+    [flip]
+  );
 
   useEffect(() => {
     if (flip.length === 2) {
       setMove((prev) => prev + 1);
 
       if (gameCards[flip[0]].id === gameCards[flip[1]].id) {
-        console.log("match",gameCards[flip[1]].id)
         setMatch((prev) => [...prev, gameCards[flip[0]]?.id]);
-        setScore((prev) => {
-            const currentScore=prev+1
-           
-            return currentScore
-        });
+        setScore((prev) => prev + 1);
         setFlip([]);
       }
 
-   setClick(false)
-
+      setClick(false);
 
       setTimeout(() => {
         setFlip([]);
-        setClick(true)
+        setClick(true);
       }, 1000);
     }
-  
+  }, [flip]);
 
-  }, [flip,score]);
+  const reset = () => {
+    setGameCards(cardMixer([...gifs, ...gifs]));
+    setFlip([]);
+    setMatch([]);
+    setScore(0);
+    setMove(0);
+    setClick(true);
+    localStorageUtil.clearStorage();
+  };
 
   return (
     <div className="gameWrap">
+      <div className="cardHeader">
+        <div className="title">
+          <h2 onClick={() => goHome(false)}>MemeMemo</h2>
+        </div>
+        <div className="value">
+          <h1>
+            <span>Score: </span>
+            {score}
+          </h1>
+          <h1>
+            <span>Moves: </span>
+            {move}
+          </h1>
+        </div>
+      </div>
       <div className="gameBox">
-        <div className="cardHeader"><h1>Move: {move} </h1>
-        <h1>Points: {score}</h1> </div>
         <div className="cardBody">
           {gameCards.map((card, index) => (
-            <div 
-              key={index+card.id} 
-              className="oneCard" 
+            <div
+              key={index + card.id}
+              className="oneCard"
               onClick={() => {
-                if (!match.includes(card.id) && !flip.includes(index)&&click) {
+                if (!match.includes(card.id) && !flip.includes(index) && click) {
                   handleFlip(index);
                 }
               }}
             >
-              <div className="holder" id={match.includes(card.id) || flip.includes(index) ? "spinIt" : ""}>
+              <div
+                className="holder"
+                id={match.includes(card.id) || flip.includes(index) ? "spinIt" : ""}
+              >
                 <div className="front"></div>
                 <div className="back">
                   <img src={card.gif} alt="" />
@@ -120,14 +164,18 @@ const modalRef =useRef();
           ))}
         </div>
       </div>
-      {  (score===8 && match.length===8)&&
-        <dialog
-        id='dialog' ref={modalRef}>
-          <h1>🔥🔥🔥</h1>
-          <h1>You won the game with in {move} moves </h1> 
-          <button onClick={()=>{reset()}}>New Game</button>
-        </dialog>
-      }
+      {score === 8 && match.length === 8 && (
+        <div id="bg">
+          <div id="dialog" ref={modalRef}>
+            <div className="pro">
+              <img src={getMemeTier().img} alt="" />
+            </div>
+            <h1>{getMemeTier().title}</h1>
+            <h1>You won the game within {move} moves</h1>
+            <button onClick={reset}>New Game</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

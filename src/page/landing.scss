@@ -1,0 +1,56 @@
+.wrap{
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  
+    .title{
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-stroke-color: yellow;
+        line-height: .8;
+        color: rgba(255, 255, 0, 0);
+        font-size: 12rem;
+        transition: line-height .3s ease-in-out;
+    }
+    button{
+        width: 200px;
+        height: 4rem;
+        border-radius: 30px; 
+    background-color: rgb(255, 145, 0);
+   
+color: #000;
+
+&:hover{
+    background-color: yellow;
+    color: #000;
+    font-size: 1rem;
+}
+}
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+   gap: .8rem;
+    &:hover .title {
+        line-height: 1.1;
+       
+    }
+}
+
+@media (max-width:575px){
+    .wrap{
+        button{
+            width: 176px;
+  height: 3rem;
+        }
+        .title{
+            font-size: 6rem;
+        }
+    }
+}
