@@ -131,12 +131,15 @@ position: relative;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 4rem;
+        gap: 2rem;
         h1{
             font-size: 18px;
             font-weight: 400;
             color: #000;
             line-height: 24px;
+        }
+        #descript{
+            font-size: 12px;
         }
         button{
             border: none;
@@ -172,17 +175,25 @@ position: relative;
     }
 }
 
-@media (max-width:400px){
-    .cardBody {
-        grid-template-rows: repeat(4, 4rem) !important;
-        grid-template-columns: repeat(4, 4rem) !important;
-        gap: .6rem;
-      }
-}
-@media (max-width:320px){
+@media (max-width:500px){
     .cardBody {
         grid-template-rows: repeat(4, 3.5rem) !important;
         grid-template-columns: repeat(4, 3.5rem) !important;
         gap: .6rem;
+    }
+
+    #bg{
+        #dialog{
+            width: 300px;
+        }
+        h1{
+            font-size: 8px;
+            font-weight: 400;
+            color: #000;
+            line-height: 24px;
+        }
+        #descript{
+            font-size: 2px;
+        }
     }
 }

@@ -13,7 +13,9 @@ import noob from "../assets/noob.gif";
 import advance from "../assets/advance.gif";
 import god from "../assets/god.gif";
 import intermediate from "../assets/intermediate.gif";
-
+import flipSound from "../assets/flip.wav";
+import winSound from "../assets/win.wav";
+import failSound from "../assets/wrong.mp3";
 function Game({ goHome }) {
   const [gameCards, setGameCards] = useState(
     localStorageUtil.getItem("cards") || []
@@ -24,7 +26,9 @@ function Game({ goHome }) {
   const [click, setClick] = useState(true);
   const [score, setScore] = useState(localStorageUtil.getItem("score") || 0);
   const modalRef = useRef();
-
+  const audioWinRef = useRef(new Audio(winSound));
+  const audioFailRef = useRef(new Audio(failSound));
+  const audioFlipRef = useRef(new Audio(flipSound));
   const moveRef = useRef(move);
   const scoreRef = useRef(score);
   const flipRef = useRef(flip);
@@ -52,7 +56,6 @@ function Game({ goHome }) {
     return newCards;
   }, []);
 
- 
   useEffect(() => {
     moveRef.current = move;
     scoreRef.current = score;
@@ -62,15 +65,13 @@ function Game({ goHome }) {
   }, [move, score, flip, match, gameCards]);
 
   useEffect(() => {
-
-    if(!localStorageUtil.getItem("move")){
+    if (!localStorageUtil.getItem("move")) {
       setGameCards(cardMixer([...gifs, ...gifs]));
     }
-    
 
     return () => {
       console.log("Cleanup", moveRef.current, scoreRef.current);
-// save game data
+      // save game data
       if (moveRef.current > 0 && scoreRef.current < 8) {
         localStorageUtil.setItem("score", scoreRef.current);
         localStorageUtil.setItem("move", moveRef.current);
@@ -87,6 +88,7 @@ function Game({ goHome }) {
   const handleFlip = useCallback(
     (index) => {
       if (flip.length < 2) {
+        audioFlipRef.current.play();
         setFlip((prev) => [...prev, index]);
       }
     },
@@ -100,7 +102,11 @@ function Game({ goHome }) {
       if (gameCards[flip[0]].id === gameCards[flip[1]].id) {
         setMatch((prev) => [...prev, gameCards[flip[0]]?.id]);
         setScore((prev) => prev + 1);
+        audioWinRef.current.play();
         setFlip([]);
+      }
+      else{
+        audioFailRef.current.play()
       }
 
       setClick(false);
@@ -121,6 +127,40 @@ function Game({ goHome }) {
     setClick(true);
     localStorageUtil.clearStorage();
   };
+  const memeTiers = {
+    god: {
+      title: "👑 GOD MODE",
+      description: "സ്റ്റീഫൻ നമ്മൾ ഉദ്ദേശിച്ച ആളല്ല സർ",
+      gif: god,
+    },
+    advanced: {
+      title: "🔥 ADVANCED",
+      description: "വിപ്ലവസിംഹമേ.(ഈ തലച്ചോറ് ഇന്ത്യക്ക് വേണം..!!)",
+      gif: advance,
+    },
+    intermediate: {
+      title: "😐 INTERMEDIATE",
+      description: "വിപ്ലവസിംഹമേ...കനിയണം..!!",
+      gif: intermediate,
+    },
+    noob: {
+      title: "🤡 NOOB TIER",
+      description: "ഇത്രയും വലിയ ഗതിക്കെട്ടവൻ ആരെങ്കിലും ഉണ്ടാകുമോ..!!",
+      gif: noob,
+    },
+  };
+function getMemeTier() {
+    if (move < 8) return memeTiers.invalid;
+
+    const efficiency = score / move;
+
+    if (score === 8 && move === 8) return memeTiers.god;
+    if (efficiency >= 0.9) return memeTiers.advanced;
+    if (efficiency >= 0.6) return memeTiers.intermediate;
+    if (efficiency >= 0.4) return memeTiers.noob;
+    
+}
+
 
   return (
     <div className="gameWrap">
@@ -146,14 +186,22 @@ function Game({ goHome }) {
               key={index + card.id}
               className="oneCard"
               onClick={() => {
-                if (!match.includes(card.id) && !flip.includes(index) && click) {
+                if (
+                  !match.includes(card.id) &&
+                  !flip.includes(index) &&
+                  click
+                ) {
                   handleFlip(index);
                 }
               }}
             >
               <div
                 className="holder"
-                id={match.includes(card.id) || flip.includes(index) ? "spinIt" : ""}
+                id={
+                  match.includes(card.id) || flip.includes(index)
+                    ? "spinIt"
+                    : ""
+                }
               >
                 <div className="front"></div>
                 <div className="back">
@@ -164,13 +212,14 @@ function Game({ goHome }) {
           ))}
         </div>
       </div>
-      {score === 8 && match.length === 8 && (
+      {score >= 8 && match.length>=8 && (
         <div id="bg">
           <div id="dialog" ref={modalRef}>
             <div className="pro">
-              <img src={getMemeTier().img} alt="" />
+              <img src={getMemeTier()?.gif} alt="" />
             </div>
-            <h1>{getMemeTier().title}</h1>
+            <h1>{getMemeTier()?.title}</h1>
+            <h1 id="descript">{getMemeTier()?.description}</h1>
             <h1>You won the game within {move} moves</h1>
             <button onClick={reset}>New Game</button>
           </div>
