@@ -132,6 +132,8 @@ position: relative;
         justify-content: center;
         align-items: center;
         gap: 2rem;
+        padding: 1rem;
+        text-align: center;
         h1{
             font-size: 18px;
             font-weight: 400;
@@ -177,8 +179,8 @@ position: relative;
 
 @media (max-width:500px){
     .cardBody {
-        grid-template-rows: repeat(4, 3.5rem) !important;
-        grid-template-columns: repeat(4, 3.5rem) !important;
+        grid-template-rows: repeat(4, 5rem) !important;
+        grid-template-columns: repeat(4, 5rem) !important;
         gap: .6rem;
     }
 
@@ -197,3 +199,10 @@ position: relative;
         }
     }
 }
+
+@media (max-width:380px){
+    .cardBody {
+        grid-template-rows: repeat(4, 3.5rem) !important;
+        grid-template-columns: repeat(4, 3.5rem) !important;
+        gap: .6rem;
+    }}
