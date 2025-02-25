@@ -156,8 +156,8 @@ function getMemeTier() {
 
     if (score === 8 && move === 8) return memeTiers.god;
     if (efficiency >= 0.9) return memeTiers.advanced;
-    if (efficiency >= 0.6) return memeTiers.intermediate;
-    if (efficiency >= 0.4) return memeTiers.noob;
+    if (efficiency >= 0.5) return memeTiers.intermediate;
+    if (efficiency < 0.5) return memeTiers.noob;
     
 }
 
