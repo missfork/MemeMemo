@@ -41,6 +41,7 @@ color: #000;
         line-height: 1.1;
        
     }
+    
 }
 
 @media (max-width:575px){
@@ -48,9 +49,20 @@ color: #000;
         button{
             width: 176px;
   height: 3rem;
+  &:active{
+    background-color: yellow;
+    color: #000;
+    font-size: 1rem;
+}
         }
         .title{
             font-size: 6rem;
+        }
+        .container{
+            &:active .title {
+                line-height: 1.1;
+               
+            }
         }
     }
 }

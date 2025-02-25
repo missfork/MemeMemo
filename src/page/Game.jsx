@@ -130,17 +130,17 @@ function Game({ goHome }) {
   const memeTiers = {
     god: {
       title: "👑 GOD MODE",
-      description: "സ്റ്റീഫൻ നമ്മൾ ഉദ്ദേശിച്ച ആളല്ല സർ",
+      description: "ഹൈ റേഞ്ചിന്റെ വിപ്ലവസിംഹം",
       gif: god,
     },
     advanced: {
       title: "🔥 ADVANCED",
-      description: "വിപ്ലവസിംഹമേ.(ഈ തലച്ചോറ് ഇന്ത്യക്ക് വേണം..!!)",
+      description: "ഇന്ത്യൻ സൈബർ വിംഗിൻ്റെ കമാൻഡിംഗ് ഓഫീസർ മേജർ ശ്രീകുമാർ !!)",
       gif: advance,
     },
     intermediate: {
       title: "😐 INTERMEDIATE",
-      description: "വിപ്ലവസിംഹമേ...കനിയണം..!!",
+      description: "ഞാൻ ആരാ ചേട്ടാ ..!!",
       gif: intermediate,
     },
     noob: {
@@ -150,7 +150,7 @@ function Game({ goHome }) {
     },
   };
 function getMemeTier() {
-    if (move < 8) return memeTiers.invalid;
+    if (move < 8) return memeTiers.advanced;
 
     const efficiency = score / move;
 
@@ -158,6 +158,9 @@ function getMemeTier() {
     if (efficiency >= 0.9) return memeTiers.advanced;
     if (efficiency >= 0.5) return memeTiers.intermediate;
     if (efficiency < 0.5) return memeTiers.noob;
+
+     
+    
     
 }
 
